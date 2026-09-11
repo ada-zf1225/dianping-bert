@@ -5,5 +5,8 @@
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true
   },
-  "files.exclude": { "**/__pycache__": true }
+  "files.exclude": { "**/__pycache__": true },
+  "editor.unicodeHighlight.ambiguousCharacters": false,
+  "python.analysis.inlayHints.variableTypes": false,
+"python.analysis.inlayHints.callArgumentNames": "off"
 }
