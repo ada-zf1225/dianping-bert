@@ -1,0 +1,27 @@
+{
+  "run": "bert_base_len512",
+  "args": {
+    "model": "bert-base-chinese",
+    "max_len": 512,
+    "batch": 16,
+    "epochs": 2,
+    "lr": 2e-05,
+    "seed": 42,
+    "n_train": 0,
+    "run": "bert_base_len512"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "val_acc": 0.7672816181373638,
+      "sec": 85
+    },
+    {
+      "epoch": 2,
+      "val_acc": 0.7683929762169371,
+      "sec": 84
+    }
+  ],
+  "best_val_acc": 0.7683929762169371,
+  "test_acc": 0.7787081339712919
+}

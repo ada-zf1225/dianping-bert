@@ -1,0 +1,27 @@
+{
+  "run": "bert_base_s2026",
+  "args": {
+    "model": "bert-base-chinese",
+    "max_len": 256,
+    "batch": 32,
+    "epochs": 2,
+    "lr": 2e-05,
+    "seed": 2026,
+    "n_train": 0,
+    "run": "bert_base_s2026"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "val_acc": 0.769059791064681,
+      "sec": 44
+    },
+    {
+      "epoch": 2,
+      "val_acc": 0.7752833963102912,
+      "sec": 43
+    }
+  ],
+  "best_val_acc": 0.7752833963102912,
+  "test_acc": 0.7719298245614035
+}

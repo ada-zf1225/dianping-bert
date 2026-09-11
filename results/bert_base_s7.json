@@ -1,0 +1,27 @@
+{
+  "run": "bert_base_s7",
+  "args": {
+    "model": "bert-base-chinese",
+    "max_len": 256,
+    "batch": 32,
+    "epochs": 2,
+    "lr": 2e-05,
+    "seed": 7,
+    "n_train": 0,
+    "run": "bert_base_s7"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "val_acc": 0.7588352967326073,
+      "sec": 44
+    },
+    {
+      "epoch": 2,
+      "val_acc": 0.7721715936874861,
+      "sec": 43
+    }
+  ],
+  "best_val_acc": 0.7721715936874861,
+  "test_acc": 0.7741228070175439
+}

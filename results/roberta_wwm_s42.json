@@ -1,0 +1,27 @@
+{
+  "run": "roberta_wwm_s42",
+  "args": {
+    "model": "hfl/chinese-roberta-wwm-ext",
+    "max_len": 256,
+    "batch": 32,
+    "epochs": 2,
+    "lr": 2e-05,
+    "seed": 42,
+    "n_train": 0,
+    "run": "roberta_wwm_s42"
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "val_acc": 0.7741720382307179,
+      "sec": 44
+    },
+    {
+      "epoch": 2,
+      "val_acc": 0.7723938653034007,
+      "sec": 43
+    }
+  ],
+  "best_val_acc": 0.7741720382307179,
+  "test_acc": 0.7777113237639554
+}
