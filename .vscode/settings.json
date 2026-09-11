@@ -7,6 +7,6 @@
   },
   "files.exclude": { "**/__pycache__": true },
   "editor.unicodeHighlight.ambiguousCharacters": false,
-  "python.analysis.inlayHints.variableTypes": false,
-"python.analysis.inlayHints.callArgumentNames": "off"
+ 
+ "python.analysis.inlayHints.callArgumentNames": "off"
 }

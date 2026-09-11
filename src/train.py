@@ -1,8 +1,9 @@
 # src/train.py
-# BERT 微调：加载预训练主干 + 分类头，训练若干 epoch，按验证集选最优，最后测一次测试集
+# BERT 微调：预训练主干 + 分类头，按验证集选最优 epoch，最后测一次测试集，导出预测
 import argparse, json, time, random
 from pathlib import Path
 import numpy as np
+import pandas as pd
 import torch
 from transformers import (
     AutoTokenizer,
@@ -28,17 +29,19 @@ def pick_device():
 
 @torch.no_grad()
 def evaluate(model, loader, device):
-    """跑一遍 loader，返回准确率。不算梯度。"""
+    """跑一遍 loader，返回 (准确率, 预测列表, 好评概率列表)"""
     model.eval()
-    correct = total = 0
+    preds, probs, labels = [], [], []
     for batch in loader:
         batch = {k: v.to(device) for k, v in batch.items()}
         logits = model(**batch).logits  # (B, 2)
-        pred = logits.argmax(dim=-1)  # 取概率大的那一类
-        correct += (pred == batch["labels"]).sum().item()
-        total += batch["labels"].numel()
+        p = torch.softmax(logits.float(), dim=-1)[:, 1]  # 判为"好评"的概率
+        preds += logits.argmax(-1).tolist()
+        probs += p.tolist()
+        labels += batch["labels"].tolist()
     model.train()
-    return correct / total
+    acc = sum(int(a == b) for a, b in zip(preds, labels)) / len(labels)
+    return acc, preds, probs
 
 
 def main():
@@ -46,7 +49,7 @@ def main():
     p.add_argument("--model", default="bert-base-chinese")
     p.add_argument("--max_len", type=int, default=256)
     p.add_argument("--batch", type=int, default=32)
-    p.add_argument("--epochs", type=int, default=3)
+    p.add_argument("--epochs", type=int, default=2)
     p.add_argument("--lr", type=float, default=2e-5)
     p.add_argument("--seed", type=int, default=42)
     p.add_argument(
@@ -57,7 +60,8 @@ def main():
 
     set_seed(args.seed)
     device = pick_device()
-    print("device:", device)
+    use_bf16 = device.type == "cuda"
+    print("device:", device, " bf16:", use_bf16)
 
     # 数据
     tok = AutoTokenizer.from_pretrained(args.model)
@@ -78,15 +82,15 @@ def main():
     groups = [
         {
             "params": [
-                p
-                for n, p in model.named_parameters()
+                q
+                for n, q in model.named_parameters()
                 if not any(k in n for k in no_decay)
             ],
             "weight_decay": 0.01,
         },
         {
             "params": [
-                p for n, p in model.named_parameters() if any(k in n for k in no_decay)
+                q for n, q in model.named_parameters() if any(k in n for k in no_decay)
             ],
             "weight_decay": 0.0,
         },
@@ -102,7 +106,10 @@ def main():
         t0, running = time.time(), 0.0
         for step, batch in enumerate(tr_loader, 1):
             batch = {k: v.to(device) for k, v in batch.items()}
-            out = model(**batch)  # 前向：有 labels 就自动算交叉熵
+            with torch.autocast(
+                device_type=device.type, dtype=torch.bfloat16, enabled=use_bf16
+            ):
+                out = model(**batch)  # 前向：有 labels 就自动算交叉熵
             out.loss.backward()  # 反向：算所有参数的梯度
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             opt.step()
@@ -114,7 +121,7 @@ def main():
                     f"epoch {epoch} step {step}/{len(tr_loader)} loss {running / 50:.4f}"
                 )
                 running = 0.0
-        val_acc = evaluate(model, va_loader, device)
+        val_acc, _, _ = evaluate(model, va_loader, device)
         history.append(
             {"epoch": epoch, "val_acc": val_acc, "sec": round(time.time() - t0)}
         )
@@ -125,23 +132,36 @@ def main():
                 k: v.detach().cpu().clone() for k, v in model.state_dict().items()
             }
 
-    # 用验证集最优的那个 epoch 的参数测一次测试集
+    # 用验证集最优的参数，测一次验证集和测试集，并导出预测
     model.load_state_dict(best_state)
-    test_acc = evaluate(model, te_loader, device)
-    print(f"best val {best_val:.4f}  test {test_acc:.4f}")
+    val_acc, va_pred, va_prob = evaluate(model, va_loader, device)
+    test_acc, te_pred, te_prob = evaluate(model, te_loader, device)
+    print(f"best val {val_acc:.4f}  test {test_acc:.4f}")
 
     Path(ROOT / "results").mkdir(exist_ok=True)
+    val.assign(pred=va_pred, p_pos=va_prob).to_csv(
+        ROOT / f"results/{args.run}_val_pred.csv", index=False
+    )
+    test.assign(pred=te_pred, p_pos=te_prob).to_csv(
+        ROOT / f"results/{args.run}_test_pred.csv", index=False
+    )
     json.dump(
         {
             "run": args.run,
             "args": vars(args),
             "history": history,
-            "best_val_acc": best_val,
+            "best_val_acc": val_acc,
             "test_acc": test_acc,
         },
         open(ROOT / f"results/{args.run}.json", "w"),
         ensure_ascii=False,
         indent=2,
+    )
+    print(
+        "saved:",
+        f"results/{args.run}.json",
+        f"results/{args.run}_val_pred.csv",
+        f"results/{args.run}_test_pred.csv",
     )
 
 

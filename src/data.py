@@ -34,22 +34,23 @@ class ReviewDataset(Dataset):
         return self.texts[i], self.labels[i]
 
 
-def make_collate(tok, max_len: int):
-    """返回一个函数：把 [(文本, 标签), ...] 变成一个 batch 的张量字典"""
+class Collate:
+    """把 [(文本, 标签), ...] 变成一个 batch 的张量字典。写成类是为了能被子进程 pickle。"""
 
-    def collate(batch):
+    def __init__(self, tok, max_len: int):
+        self.tok, self.max_len = tok, max_len
+
+    def __call__(self, batch):
         texts, labels = zip(*batch)
-        enc = tok(
+        enc = self.tok(
             list(texts),
             truncation=True,
-            max_length=max_len,
+            max_length=self.max_len,
             padding=True,
             return_tensors="pt",
         )
         enc["labels"] = torch.tensor(labels)
         return enc
-
-    return collate
 
 
 def make_loader(df, tok, max_len: int, batch_size: int, shuffle: bool):
@@ -57,5 +58,6 @@ def make_loader(df, tok, max_len: int, batch_size: int, shuffle: bool):
         ReviewDataset(df),
         batch_size=batch_size,
         shuffle=shuffle,
-        collate_fn=make_collate(tok, max_len),
+        collate_fn=Collate(tok, max_len),
+        num_workers=4,
     )
