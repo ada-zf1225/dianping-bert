@@ -1,12 +1,14 @@
 # src/plots.py
 # 从 results/ 生成 README 里的全部图片，输出到 docs/figs/
-import glob, json
-from pathlib import Path
-import numpy as np
-import pandas as pd
+import glob
+import json
+
 import matplotlib
+import pandas as pd
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+
 from src.data import ROOT
 
 OUT = ROOT / "docs/figs"
@@ -15,7 +17,11 @@ OUT.mkdir(parents=True, exist_ok=True)
 plt.rcParams["font.family"] = ["PingFang SC", "Heiti SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Noto Sans CJK JP",
                                "Microsoft YaHei", "Arial Unicode MS", "DejaVu Sans"]
 plt.rcParams["axes.unicode_minus"] = False
-import logging, warnings; logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR); warnings.filterwarnings("ignore")
+import logging
+import warnings
+
+logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
+warnings.filterwarnings("ignore")
 plt.rcParams["figure.dpi"] = 150
 C_BASE, C_BERT, C_REF, C_GREY = "#8c8c8c", "#2f6db5", "#d1495b", "#cccccc"
 

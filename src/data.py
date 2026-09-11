@@ -1,10 +1,11 @@
 # src/data.py
 # 数据层：读数据、切验证集、Dataset、动态 padding 的 DataLoader
+from pathlib import Path
+
 import pandas as pd
 import torch
-from pathlib import Path
 from sklearn.model_selection import train_test_split
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import DataLoader, Dataset
 
 ROOT = Path(__file__).resolve().parents[1]
 TEXT, LABEL = "sentence", "label"
@@ -53,11 +54,11 @@ class Collate:
         return enc
 
 
-def make_loader(df, tok, max_len: int, batch_size: int, shuffle: bool):
+def make_loader(df, tok, max_len: int, batch_size: int, shuffle: bool, num_workers: int = 4):
     return DataLoader(
         ReviewDataset(df),
         batch_size=batch_size,
         shuffle=shuffle,
         collate_fn=Collate(tok, max_len),
-        num_workers=4,
+        num_workers=num_workers,
     )

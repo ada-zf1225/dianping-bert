@@ -5,3 +5,4 @@ __pycache__/
 checkpoints/
 results/smoke*
 .DS_Store
+results/ci_smoke*

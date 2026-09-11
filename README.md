@@ -1,5 +1,7 @@
 # 大众点评评论情感分类：BERT 能做到多好，以及为什么做不到更好
 
+![CI](https://github.com/ada-zf1225/dianping-bert/actions/workflows/ci.yml/badge.svg)
+
 > 基于 `bert-base-chinese` 微调的中文评论二分类。基线 74.9%，BERT 77.3%，达摩院官方模型 78.7%——所有方法都挤在一个 4 个点的窄带里。这个项目做了两件事：**把 BERT 微调完整做一遍，然后弄清楚天花板到底是模型还是数据。**
 
 <p align="center"><img src="docs/figs/main_results.png" width="720"></p>

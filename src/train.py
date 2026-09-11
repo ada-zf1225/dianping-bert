@@ -1,16 +1,20 @@
 # src/train.py
 # BERT 微调：预训练主干 + 分类头，按验证集选最优 epoch，最后测一次测试集，导出预测
-import argparse, json, time, random
+import argparse
+import json
+import random
+import time
 from pathlib import Path
+
 import numpy as np
-import pandas as pd
 import torch
 from transformers import (
-    AutoTokenizer,
     AutoModelForSequenceClassification,
+    AutoTokenizer,
     get_linear_schedule_with_warmup,
 )
-from src.data import load_splits, make_loader, ROOT
+
+from src.data import ROOT, load_splits, make_loader
 
 
 def set_seed(s):

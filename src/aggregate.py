@@ -1,9 +1,11 @@
 # src/aggregate.py
 # 读 results/*.json，输出 Markdown 结果表
-import json, glob
-import numpy as np
-import pandas as pd
+import glob
+import json
 from pathlib import Path
+
+import pandas as pd
+
 from src.data import ROOT
 
 rows = []

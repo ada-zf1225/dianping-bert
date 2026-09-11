@@ -1,6 +1,7 @@
 # src/confidence.py
 # 模型置信度和准确率的关系：p_pos 越接近 0.5 的样本，是不是越判不准
 import pandas as pd
+
 from src.data import ROOT
 
 df = pd.read_csv(ROOT / "results/bert_base_s42_val_pred.csv")

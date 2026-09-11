@@ -1,6 +1,7 @@
 # src/sample_for_human.py
 # 从验证集预测里随机抽 50 条，隐藏标签导出给人盲标，答案另存
 import pandas as pd
+
 from src.data import ROOT
 
 df = pd.read_csv(ROOT / "results/bert_base_s42_val_pred.csv")

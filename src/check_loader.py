@@ -1,6 +1,7 @@
 # src/check_loader.py
 # 验证 data.py：取一个 batch 看形状和内容
 from transformers import AutoTokenizer
+
 from src.data import load_splits, make_loader
 
 tok = AutoTokenizer.from_pretrained("bert-base-chinese")

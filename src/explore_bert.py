@@ -1,7 +1,7 @@
 # src/explore_bert.py
 # 看 tokenizer 把一句话变成什么，看 BERT 输出什么形状
 import torch
-from transformers import AutoTokenizer, AutoModel
+from transformers import AutoModel, AutoTokenizer
 
 name = "bert-base-chinese"
 tok = AutoTokenizer.from_pretrained(name)

@@ -19,4 +19,14 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pandas-stubs>=3.0.5.260730",
+    "pytest>=9.1.1",
+    "ruff>=0.16.7",
 ]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = ["E402", "E702", "E731"]
